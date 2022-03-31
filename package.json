@@ -1,0 +1,28 @@
+{
+  "name": "neo4j",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --experimental-vm-modules $(yarn bin)/jest"
+  },
+  "dependencies": {
+    "@apollo/subgraph": "^0.4.0",
+    "@graphql-tools/utils": "^8.6.5",
+    "@neo4j/graphql": "^3.0.3",
+    "@neo4j/graphql-ogm": "^3.0.3",
+    "apollo-server": "^3.6.7",
+    "dataloader": "^2.0.0",
+    "dotenv": "^16.0.0",
+    "graphql": "^16.3.0",
+    "neo4j-driver": "^4.4.5",
+    "nodemon": "^2.0.15",
+    "typescript": "^4.6.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.1",
+    "@types/node": "^17.0.23",
+    "jest": "^27.5.1"
+  }
+}

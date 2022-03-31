@@ -1,0 +1,12 @@
+subgraphs:
+  neo4j:
+    routing_url: http://localhost:4000
+    schema:
+      file: ./schema.graphql
+  another:
+    routing_url: http://localhost:4001
+    schema:
+      sdl: |
+        type Query {
+          hello: String
+        }

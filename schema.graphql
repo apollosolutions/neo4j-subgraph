@@ -1,0 +1,566 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+directive @key(fields: _FieldSet) on OBJECT | INTERFACE
+
+type Query {
+  _entities(representations: [_Any!]!): [_Entity]
+  movies(where: MovieWhere, options: MovieOptions): [Movie!]!
+  moviesAggregate(where: MovieWhere): MovieAggregateSelection!
+  actors(where: ActorWhere, options: ActorOptions): [Actor!]!
+  actorsAggregate(where: ActorWhere): ActorAggregateSelection!
+}
+
+type Mutation {
+  createMovies(input: [MovieCreateInput!]!): CreateMoviesMutationResponse!
+  deleteMovies(where: MovieWhere, delete: MovieDeleteInput): DeleteInfo!
+  updateMovies(where: MovieWhere, update: MovieUpdateInput, connect: MovieConnectInput, disconnect: MovieDisconnectInput, create: MovieRelationInput, delete: MovieDeleteInput, connectOrCreate: MovieConnectOrCreateInput): UpdateMoviesMutationResponse!
+  createActors(input: [ActorCreateInput!]!): CreateActorsMutationResponse!
+  deleteActors(where: ActorWhere, delete: ActorDeleteInput): DeleteInfo!
+  updateActors(where: ActorWhere, update: ActorUpdateInput, connect: ActorConnectInput, disconnect: ActorDisconnectInput, create: ActorRelationInput, delete: ActorDeleteInput, connectOrCreate: ActorConnectOrCreateInput): UpdateActorsMutationResponse!
+}
+
+scalar _Any
+
+scalar _FieldSet
+
+enum SortDirection {
+  """Sort by field values in ascending order."""
+  ASC
+  """Sort by field values in descending order."""
+  DESC
+}
+
+union _Entity = Actor | Movie
+
+type Actor @key(fields: "id") {
+  id: ID!
+  name: String
+  movies(where: MovieWhere, options: MovieOptions, directed: Boolean = true): [Movie!]!
+  moviesAggregate(where: MovieWhere, directed: Boolean = true): ActorMovieMoviesAggregationSelection
+  moviesConnection(where: ActorMoviesConnectionWhere, first: Int, after: String, directed: Boolean = true, sort: [ActorMoviesConnectionSort!]): ActorMoviesConnection!
+}
+
+type ActorAggregateSelection {
+  count: Int!
+  id: IDAggregateSelectionNonNullable!
+  name: StringAggregateSelectionNullable!
+}
+
+type ActorMovieMoviesAggregationSelection {
+  count: Int!
+  node: ActorMovieMoviesNodeAggregateSelection
+}
+
+type ActorMovieMoviesNodeAggregateSelection {
+  id: IDAggregateSelectionNonNullable!
+  title: StringAggregateSelectionNullable!
+}
+
+type ActorMoviesConnection {
+  edges: [ActorMoviesRelationship!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+type ActorMoviesRelationship {
+  cursor: String!
+  node: Movie!
+}
+
+type CreateActorsMutationResponse {
+  info: CreateInfo!
+  actors: [Actor!]!
+}
+
+type CreateInfo {
+  bookmark: String
+  nodesCreated: Int!
+  relationshipsCreated: Int!
+}
+
+type CreateMoviesMutationResponse {
+  info: CreateInfo!
+  movies: [Movie!]!
+}
+
+type DeleteInfo {
+  bookmark: String
+  nodesDeleted: Int!
+  relationshipsDeleted: Int!
+}
+
+type IDAggregateSelectionNonNullable {
+  shortest: ID!
+  longest: ID!
+}
+
+type Movie @key(fields: "id") {
+  id: ID!
+  title: String
+  actors(where: ActorWhere, options: ActorOptions, directed: Boolean = true): [Actor!]!
+  actorsAggregate(where: ActorWhere, directed: Boolean = true): MovieActorActorsAggregationSelection
+  actorsConnection(where: MovieActorsConnectionWhere, first: Int, after: String, directed: Boolean = true, sort: [MovieActorsConnectionSort!]): MovieActorsConnection!
+}
+
+type MovieActorActorsAggregationSelection {
+  count: Int!
+  node: MovieActorActorsNodeAggregateSelection
+}
+
+type MovieActorActorsNodeAggregateSelection {
+  id: IDAggregateSelectionNonNullable!
+  name: StringAggregateSelectionNullable!
+}
+
+type MovieActorsConnection {
+  edges: [MovieActorsRelationship!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+type MovieActorsRelationship {
+  cursor: String!
+  node: Actor!
+}
+
+type MovieAggregateSelection {
+  count: Int!
+  id: IDAggregateSelectionNonNullable!
+  title: StringAggregateSelectionNullable!
+}
+
+"""Pagination information (Relay)"""
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type StringAggregateSelectionNullable {
+  shortest: String
+  longest: String
+}
+
+type UpdateActorsMutationResponse {
+  info: UpdateInfo!
+  actors: [Actor!]!
+}
+
+type UpdateInfo {
+  bookmark: String
+  nodesCreated: Int!
+  nodesDeleted: Int!
+  relationshipsCreated: Int!
+  relationshipsDeleted: Int!
+}
+
+type UpdateMoviesMutationResponse {
+  info: UpdateInfo!
+  movies: [Movie!]!
+}
+
+input ActorConnectInput {
+  movies: [ActorMoviesConnectFieldInput!]
+}
+
+input ActorConnectOrCreateInput {
+  movies: [ActorMoviesConnectOrCreateFieldInput!]
+}
+
+input ActorConnectOrCreateWhere {
+  node: ActorUniqueWhere!
+}
+
+input ActorConnectWhere {
+  node: ActorWhere!
+}
+
+input ActorCreateInput {
+  name: String
+  movies: ActorMoviesFieldInput
+}
+
+input ActorDeleteInput {
+  movies: [ActorMoviesDeleteFieldInput!]
+}
+
+input ActorDisconnectInput {
+  movies: [ActorMoviesDisconnectFieldInput!]
+}
+
+input ActorMoviesAggregateInput {
+  count: Int
+  count_LT: Int
+  count_LTE: Int
+  count_GT: Int
+  count_GTE: Int
+  AND: [ActorMoviesAggregateInput!]
+  OR: [ActorMoviesAggregateInput!]
+  node: ActorMoviesNodeAggregationWhereInput
+}
+
+input ActorMoviesConnectFieldInput {
+  where: MovieConnectWhere
+  connect: [MovieConnectInput!]
+}
+
+input ActorMoviesConnectionSort {
+  node: MovieSort
+}
+
+input ActorMoviesConnectionWhere {
+  AND: [ActorMoviesConnectionWhere!]
+  OR: [ActorMoviesConnectionWhere!]
+  node: MovieWhere
+  node_NOT: MovieWhere
+}
+
+input ActorMoviesConnectOrCreateFieldInput {
+  where: MovieConnectOrCreateWhere!
+  onCreate: ActorMoviesConnectOrCreateFieldInputOnCreate!
+}
+
+input ActorMoviesConnectOrCreateFieldInputOnCreate {
+  node: MovieOnCreateInput!
+}
+
+input ActorMoviesCreateFieldInput {
+  node: MovieCreateInput!
+}
+
+input ActorMoviesDeleteFieldInput {
+  where: ActorMoviesConnectionWhere
+  delete: MovieDeleteInput
+}
+
+input ActorMoviesDisconnectFieldInput {
+  where: ActorMoviesConnectionWhere
+  disconnect: MovieDisconnectInput
+}
+
+input ActorMoviesFieldInput {
+  create: [ActorMoviesCreateFieldInput!]
+  connect: [ActorMoviesConnectFieldInput!]
+  connectOrCreate: [ActorMoviesConnectOrCreateFieldInput!]
+}
+
+input ActorMoviesNodeAggregationWhereInput {
+  AND: [ActorMoviesNodeAggregationWhereInput!]
+  OR: [ActorMoviesNodeAggregationWhereInput!]
+  id_EQUAL: ID
+  title_EQUAL: String
+  title_AVERAGE_EQUAL: Float
+  title_LONGEST_EQUAL: Int
+  title_SHORTEST_EQUAL: Int
+  title_GT: Int
+  title_AVERAGE_GT: Float
+  title_LONGEST_GT: Int
+  title_SHORTEST_GT: Int
+  title_GTE: Int
+  title_AVERAGE_GTE: Float
+  title_LONGEST_GTE: Int
+  title_SHORTEST_GTE: Int
+  title_LT: Int
+  title_AVERAGE_LT: Float
+  title_LONGEST_LT: Int
+  title_SHORTEST_LT: Int
+  title_LTE: Int
+  title_AVERAGE_LTE: Float
+  title_LONGEST_LTE: Int
+  title_SHORTEST_LTE: Int
+}
+
+input ActorMoviesUpdateConnectionInput {
+  node: MovieUpdateInput
+}
+
+input ActorMoviesUpdateFieldInput {
+  where: ActorMoviesConnectionWhere
+  update: ActorMoviesUpdateConnectionInput
+  connect: [ActorMoviesConnectFieldInput!]
+  disconnect: [ActorMoviesDisconnectFieldInput!]
+  create: [ActorMoviesCreateFieldInput!]
+  delete: [ActorMoviesDeleteFieldInput!]
+  connectOrCreate: [ActorMoviesConnectOrCreateFieldInput!]
+}
+
+input ActorOnCreateInput {
+  name: String
+}
+
+input ActorOptions {
+  """
+  Specify one or more ActorSort objects to sort Actors by. The sorts will be applied in the order in which they are arranged in the array.
+  """
+  sort: [ActorSort!]
+  limit: Int
+  offset: Int
+}
+
+input ActorRelationInput {
+  movies: [ActorMoviesCreateFieldInput!]
+}
+
+"""
+Fields to sort Actors by. The order in which sorts are applied is not guaranteed when specifying many fields in one ActorSort object.
+"""
+input ActorSort {
+  id: SortDirection
+  name: SortDirection
+}
+
+input ActorUniqueWhere {
+  id: ID
+}
+
+input ActorUpdateInput {
+  name: String
+  movies: [ActorMoviesUpdateFieldInput!]
+}
+
+input ActorWhere {
+  OR: [ActorWhere!]
+  AND: [ActorWhere!]
+  id: ID
+  id_NOT: ID
+  id_IN: [ID!]
+  id_NOT_IN: [ID!]
+  id_CONTAINS: ID
+  id_NOT_CONTAINS: ID
+  id_STARTS_WITH: ID
+  id_NOT_STARTS_WITH: ID
+  id_ENDS_WITH: ID
+  id_NOT_ENDS_WITH: ID
+  name: String
+  name_NOT: String
+  name_IN: [String]
+  name_NOT_IN: [String]
+  name_CONTAINS: String
+  name_NOT_CONTAINS: String
+  name_STARTS_WITH: String
+  name_NOT_STARTS_WITH: String
+  name_ENDS_WITH: String
+  name_NOT_ENDS_WITH: String
+  movies: MovieWhere @deprecated(reason: "Use `movies_SOME` instead.")
+  movies_NOT: MovieWhere @deprecated(reason: "Use `movies_NONE` instead.")
+  moviesAggregate: ActorMoviesAggregateInput
+  """Return Actors where all of the related Movies match this filter"""
+  movies_ALL: MovieWhere
+  """Return Actors where none of the related Movies match this filter"""
+  movies_NONE: MovieWhere
+  """Return Actors where one of the related Movies match this filter"""
+  movies_SINGLE: MovieWhere
+  """Return Actors where some of the related Movies match this filter"""
+  movies_SOME: MovieWhere
+  moviesConnection: ActorMoviesConnectionWhere @deprecated(reason: "Use `moviesConnection_SOME` instead.")
+  moviesConnection_NOT: ActorMoviesConnectionWhere @deprecated(reason: "Use `moviesConnection_NONE` instead.")
+  moviesConnection_ALL: ActorMoviesConnectionWhere
+  moviesConnection_NONE: ActorMoviesConnectionWhere
+  moviesConnection_SINGLE: ActorMoviesConnectionWhere
+  moviesConnection_SOME: ActorMoviesConnectionWhere
+}
+
+input MovieActorsAggregateInput {
+  count: Int
+  count_LT: Int
+  count_LTE: Int
+  count_GT: Int
+  count_GTE: Int
+  AND: [MovieActorsAggregateInput!]
+  OR: [MovieActorsAggregateInput!]
+  node: MovieActorsNodeAggregationWhereInput
+}
+
+input MovieActorsConnectFieldInput {
+  where: ActorConnectWhere
+  connect: [ActorConnectInput!]
+}
+
+input MovieActorsConnectionSort {
+  node: ActorSort
+}
+
+input MovieActorsConnectionWhere {
+  AND: [MovieActorsConnectionWhere!]
+  OR: [MovieActorsConnectionWhere!]
+  node: ActorWhere
+  node_NOT: ActorWhere
+}
+
+input MovieActorsConnectOrCreateFieldInput {
+  where: ActorConnectOrCreateWhere!
+  onCreate: MovieActorsConnectOrCreateFieldInputOnCreate!
+}
+
+input MovieActorsConnectOrCreateFieldInputOnCreate {
+  node: ActorOnCreateInput!
+}
+
+input MovieActorsCreateFieldInput {
+  node: ActorCreateInput!
+}
+
+input MovieActorsDeleteFieldInput {
+  where: MovieActorsConnectionWhere
+  delete: ActorDeleteInput
+}
+
+input MovieActorsDisconnectFieldInput {
+  where: MovieActorsConnectionWhere
+  disconnect: ActorDisconnectInput
+}
+
+input MovieActorsFieldInput {
+  create: [MovieActorsCreateFieldInput!]
+  connect: [MovieActorsConnectFieldInput!]
+  connectOrCreate: [MovieActorsConnectOrCreateFieldInput!]
+}
+
+input MovieActorsNodeAggregationWhereInput {
+  AND: [MovieActorsNodeAggregationWhereInput!]
+  OR: [MovieActorsNodeAggregationWhereInput!]
+  id_EQUAL: ID
+  name_EQUAL: String
+  name_AVERAGE_EQUAL: Float
+  name_LONGEST_EQUAL: Int
+  name_SHORTEST_EQUAL: Int
+  name_GT: Int
+  name_AVERAGE_GT: Float
+  name_LONGEST_GT: Int
+  name_SHORTEST_GT: Int
+  name_GTE: Int
+  name_AVERAGE_GTE: Float
+  name_LONGEST_GTE: Int
+  name_SHORTEST_GTE: Int
+  name_LT: Int
+  name_AVERAGE_LT: Float
+  name_LONGEST_LT: Int
+  name_SHORTEST_LT: Int
+  name_LTE: Int
+  name_AVERAGE_LTE: Float
+  name_LONGEST_LTE: Int
+  name_SHORTEST_LTE: Int
+}
+
+input MovieActorsUpdateConnectionInput {
+  node: ActorUpdateInput
+}
+
+input MovieActorsUpdateFieldInput {
+  where: MovieActorsConnectionWhere
+  update: MovieActorsUpdateConnectionInput
+  connect: [MovieActorsConnectFieldInput!]
+  disconnect: [MovieActorsDisconnectFieldInput!]
+  create: [MovieActorsCreateFieldInput!]
+  delete: [MovieActorsDeleteFieldInput!]
+  connectOrCreate: [MovieActorsConnectOrCreateFieldInput!]
+}
+
+input MovieConnectInput {
+  actors: [MovieActorsConnectFieldInput!]
+}
+
+input MovieConnectOrCreateInput {
+  actors: [MovieActorsConnectOrCreateFieldInput!]
+}
+
+input MovieConnectOrCreateWhere {
+  node: MovieUniqueWhere!
+}
+
+input MovieConnectWhere {
+  node: MovieWhere!
+}
+
+input MovieCreateInput {
+  title: String
+  actors: MovieActorsFieldInput
+}
+
+input MovieDeleteInput {
+  actors: [MovieActorsDeleteFieldInput!]
+}
+
+input MovieDisconnectInput {
+  actors: [MovieActorsDisconnectFieldInput!]
+}
+
+input MovieOnCreateInput {
+  title: String
+}
+
+input MovieOptions {
+  """
+  Specify one or more MovieSort objects to sort Movies by. The sorts will be applied in the order in which they are arranged in the array.
+  """
+  sort: [MovieSort!]
+  limit: Int
+  offset: Int
+}
+
+input MovieRelationInput {
+  actors: [MovieActorsCreateFieldInput!]
+}
+
+"""
+Fields to sort Movies by. The order in which sorts are applied is not guaranteed when specifying many fields in one MovieSort object.
+"""
+input MovieSort {
+  id: SortDirection
+  title: SortDirection
+}
+
+input MovieUniqueWhere {
+  id: ID
+}
+
+input MovieUpdateInput {
+  title: String
+  actors: [MovieActorsUpdateFieldInput!]
+}
+
+input MovieWhere {
+  OR: [MovieWhere!]
+  AND: [MovieWhere!]
+  id: ID
+  id_NOT: ID
+  id_IN: [ID!]
+  id_NOT_IN: [ID!]
+  id_CONTAINS: ID
+  id_NOT_CONTAINS: ID
+  id_STARTS_WITH: ID
+  id_NOT_STARTS_WITH: ID
+  id_ENDS_WITH: ID
+  id_NOT_ENDS_WITH: ID
+  title: String
+  title_NOT: String
+  title_IN: [String]
+  title_NOT_IN: [String]
+  title_CONTAINS: String
+  title_NOT_CONTAINS: String
+  title_STARTS_WITH: String
+  title_NOT_STARTS_WITH: String
+  title_ENDS_WITH: String
+  title_NOT_ENDS_WITH: String
+  actors: ActorWhere @deprecated(reason: "Use `actors_SOME` instead.")
+  actors_NOT: ActorWhere @deprecated(reason: "Use `actors_NONE` instead.")
+  actorsAggregate: MovieActorsAggregateInput
+  """Return Movies where all of the related Actors match this filter"""
+  actors_ALL: ActorWhere
+  """Return Movies where none of the related Actors match this filter"""
+  actors_NONE: ActorWhere
+  """Return Movies where one of the related Actors match this filter"""
+  actors_SINGLE: ActorWhere
+  """Return Movies where some of the related Actors match this filter"""
+  actors_SOME: ActorWhere
+  actorsConnection: MovieActorsConnectionWhere @deprecated(reason: "Use `actorsConnection_SOME` instead.")
+  actorsConnection_NOT: MovieActorsConnectionWhere @deprecated(reason: "Use `actorsConnection_NONE` instead.")
+  actorsConnection_ALL: MovieActorsConnectionWhere
+  actorsConnection_NONE: MovieActorsConnectionWhere
+  actorsConnection_SINGLE: MovieActorsConnectionWhere
+  actorsConnection_SOME: MovieActorsConnectionWhere
+}
