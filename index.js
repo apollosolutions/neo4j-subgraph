@@ -70,15 +70,18 @@ if (process.argv[2] === "print") {
            * @param {import("graphql").GraphQLResolveInfo} info
            */
           __resolveReference: async ({id}, context, info) => {
-            // TODO: Data loader
+            console.log("Resolving Movie with Id ", id);
+
             const selectionSetMap = extractSelectionSetMap(info.fieldNodes[0].selectionSet);
             const selectStatement = selectionSetMap.get("Movie");
-            const result = await ogm.model("Movie").find({
+            const movies = await ogm.model("Movie").find({
               where: { id },
               selectionSet: selectStatement
             });
 
-            return result.length ? result[0] : null;
+            console.log("Located movies ", movies);
+
+            return movies.length ? movies[0] : null;
           }
         },
         Actor: {
@@ -90,15 +93,18 @@ if (process.argv[2] === "print") {
            * @param {import("graphql").GraphQLResolveInfo} info
            */
           __resolveReference: async ({id}, context, info) => {
-            // TODO: Data loader
+            console.log("Resolving Actor with Id ", id);
+
             const selectionSetMap = extractSelectionSetMap(info.fieldNodes[0].selectionSet);
             const selectStatement = selectionSetMap.get("Actor");
-            const result = await ogm.model("Actor").find({
+            const actors = await ogm.model("Actor").find({
               where: { id },
               selectionSet: selectStatement
             });
 
-            return result.length ? result[0] : null;
+            console.log("Located actors ", actors)
+
+            return actors.length ? actors[0] : null;
           }
         }
       }
