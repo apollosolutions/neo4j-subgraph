@@ -51,63 +51,66 @@ if (process.argv[2] === "print") {
   console.log(printedSchema);
 } else {
   // otherwise run a server
-  const resolvers = getResolversFromSchema(schema);
+  const resolversForSchema = getResolversFromSchema(schema);
+
+  // We build up our final set of resolvers by spreading the original resolvers built up from the
+  // schema. Then, we need to define an reference resolver (https://www.apollographql.com/docs/federation/entities/#2-define-a-reference-resolver)
+  // for each type. However, we need to maintain all of the other resolvers so we need to perform
+  // another spread within each entity's resolver definition object.
+  const resolvers = {
+    ...resolversForSchema,
+    Movie: {
+      ...resolversForSchema.Movie,
+      /**
+       * Resolves Movie entity references.
+       * @param {{ id: string }} movie
+       * @param {*} context
+       * @param {import("graphql").GraphQLResolveInfo} info
+       */
+      __resolveReference: async ({id}, context, info) => {
+        console.log("Resolving Movie with Id ", id);
+
+        const selectionSetMap = extractSelectionSetMap(info.fieldNodes[0].selectionSet);
+        const selectStatement = selectionSetMap.get("Movie");
+        const movies = await ogm.model("Movie").find({
+          where: { id },
+          selectionSet: selectStatement
+        });
+
+        console.log("Located movies ", movies);
+
+        return movies.length ? movies[0] : null;
+      }
+    },
+    Actor: {
+      ...resolversForSchema.Actor,
+      /**
+       * Resolves Actor entity references.
+       * @param {{id: string}} param0
+       * @param {*} context
+       * @param {import("graphql").GraphQLResolveInfo} info
+       */
+      __resolveReference: async ({id}, context, info) => {
+        console.log("Resolving Actor with Id ", id);
+
+        const selectionSetMap = extractSelectionSetMap(info.fieldNodes[0].selectionSet);
+        const selectStatement = selectionSetMap.get("Actor");
+        const actors = await ogm.model("Actor").find({
+          where: { id },
+          selectionSet: selectStatement
+        });
+
+        console.log("Located actors ", actors)
+
+        return actors.length ? actors[0] : null;
+      }
+    }
+  };
   const server = new ApolloServer({
     // @ts-ignore - the getResolversFromSchema type doesn't match the resolvers property type.
     schema: buildSubgraphSchema({
       typeDefs: gql(printedSchema),
-      resolvers: {
-        // Include all resolvers that are part of the schema...
-        ...resolvers,
-        Movie: {
-          // Include all resolvers that are part of the movie entity...
-          ...resolvers.Movie,
-          // Define the reference resolver: https://www.apollographql.com/docs/federation/entities/#2-define-a-reference-resolver
-          /**
-           * Resolves Movie entity references.
-           * @param {{ id: string }} movie
-           * @param {*} context
-           * @param {import("graphql").GraphQLResolveInfo} info
-           */
-          __resolveReference: async ({id}, context, info) => {
-            console.log("Resolving Movie with Id ", id);
-
-            const selectionSetMap = extractSelectionSetMap(info.fieldNodes[0].selectionSet);
-            const selectStatement = selectionSetMap.get("Movie");
-            const movies = await ogm.model("Movie").find({
-              where: { id },
-              selectionSet: selectStatement
-            });
-
-            console.log("Located movies ", movies);
-
-            return movies.length ? movies[0] : null;
-          }
-        },
-        Actor: {
-          ...resolvers.Actor,
-          /**
-           * Resolves Actor entity references.
-           * @param {{id: string}} param0
-           * @param {*} context
-           * @param {import("graphql").GraphQLResolveInfo} info
-           */
-          __resolveReference: async ({id}, context, info) => {
-            console.log("Resolving Actor with Id ", id);
-
-            const selectionSetMap = extractSelectionSetMap(info.fieldNodes[0].selectionSet);
-            const selectStatement = selectionSetMap.get("Actor");
-            const actors = await ogm.model("Actor").find({
-              where: { id },
-              selectionSet: selectStatement
-            });
-
-            console.log("Located actors ", actors)
-
-            return actors.length ? actors[0] : null;
-          }
-        }
-      }
+      resolvers: resolvers
     })
   });
   const { url } = await server.listen(4000);
