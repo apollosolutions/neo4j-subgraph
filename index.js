@@ -3,8 +3,9 @@ import neo4j from "neo4j-driver";
 import ogmPkg from "@neo4j/graphql-ogm";
 import { ApolloServer, gql } from "apollo-server";
 import { config } from "dotenv";
-import { createEntityDataloaderFactory } from "./entity-dataloaders.js";
-import { printSchemaWithDirectives } from "@graphql-tools/utils";
+import { extractSelectionSetMap } from "./entity-dataloaders.js";
+import { getResolversFromSchema, printSchemaWithDirectives } from "@graphql-tools/utils";
+import { buildSubgraphSchema } from "@apollo/subgraph";
 
 const { OGM } = ogmPkg;
 
@@ -16,12 +17,6 @@ const typeDefs = gql`
   scalar _FieldSet
   scalar _Any
   directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
-
-  union _Entity = Actor | Movie
-
-  type Query {
-    _entities(representations: [_Any!]!): [_Entity]!
-  }
 
   type Movie @key(fields: "id") {
     id: ID! @id
@@ -43,64 +38,81 @@ const driver = neo4j.driver(
 
 const ogm = new OGM({ typeDefs, driver });
 
-/** @type {import("./entity-dataloaders.js").EntityConfiguration<any, any>[]} */
-const entityConfiguration = [
-  {
-    name: "Movie",
-    model: ogm.model("Movie"),
-    refToKey: (ref) => ref.id,
-    whereClause: (keys) => ({ id_IN: keys }),
-  },
-  {
-    name: "Actor",
-    model: ogm.model("Actor"),
-    refToKey: (ref) => ref.id,
-    whereClause: (keys) => ({ id_IN: keys }),
-  },
-];
-
-const entityDataloaderFactory =
-  createEntityDataloaderFactory(entityConfiguration);
-
 const neoSchema = new Neo4jGraphQL({
   typeDefs,
-  driver,
-  resolvers: {
-    Query: {
-      _entities(_source, { representations }, _context, info) {
-        const dataloaders = entityDataloaderFactory(
-          info.fieldNodes[0].selectionSet
-        );
-
-        // Using dataloader.load ensures that the entities are returned in the
-        // same order as the representations argument. This is critical for
-        // ensuring that entities are correctly joined across subgraphs.
-        return representations.map((reference) => {
-          const { __typename } = reference;
-          return dataloaders.get(__typename).load(reference);
-        });
-      },
-    },
-    _Entity: {
-      /**
-       * @param {{ __typename: string; }} ref
-       */
-      __resolveType(ref) {
-        return ref.__typename;
-      },
-    },
-  },
+  driver
 });
 
 await ogm.init();
 const schema = await neoSchema.getSchema();
-
+const printedSchema = printSchemaWithDirectives(schema);
 // print the full schema to stdout if asked
 if (process.argv[2] === "print") {
-  console.log(printSchemaWithDirectives(schema));
+  console.log(printedSchema);
 } else {
   // otherwise run a server
-  const server = new ApolloServer({ schema });
+  const resolversForSchema = getResolversFromSchema(schema);
+
+  // We build up our final set of resolvers by spreading the original resolvers built up from the
+  // schema. Then, we need to define an reference resolver (https://www.apollographql.com/docs/federation/entities/#2-define-a-reference-resolver)
+  // for each type. However, we need to maintain all of the other resolvers so we need to perform
+  // another spread within each entity's resolver definition object.
+  const resolvers = {
+    ...resolversForSchema,
+    Movie: {
+      ...resolversForSchema.Movie,
+      /**
+       * Resolves Movie entity references.
+       * @param {{ id: string }} movie
+       * @param {*} context
+       * @param {import("graphql").GraphQLResolveInfo} info
+       */
+      __resolveReference: async ({id}, context, info) => {
+        console.log("Resolving Movie with Id ", id);
+
+        const selectionSetMap = extractSelectionSetMap(info.fieldNodes[0].selectionSet);
+        const selectStatement = selectionSetMap.get("Movie");
+        const movies = await ogm.model("Movie").find({
+          where: { id },
+          selectionSet: selectStatement
+        });
+
+        console.log("Located movies ", movies);
+
+        return movies.length ? movies[0] : null;
+      }
+    },
+    Actor: {
+      ...resolversForSchema.Actor,
+      /**
+       * Resolves Actor entity references.
+       * @param {{id: string}} param0
+       * @param {*} context
+       * @param {import("graphql").GraphQLResolveInfo} info
+       */
+      __resolveReference: async ({id}, context, info) => {
+        console.log("Resolving Actor with Id ", id);
+
+        const selectionSetMap = extractSelectionSetMap(info.fieldNodes[0].selectionSet);
+        const selectStatement = selectionSetMap.get("Actor");
+        const actors = await ogm.model("Actor").find({
+          where: { id },
+          selectionSet: selectStatement
+        });
+
+        console.log("Located actors ", actors)
+
+        return actors.length ? actors[0] : null;
+      }
+    }
+  };
+  const server = new ApolloServer({
+    // @ts-ignore - the getResolversFromSchema type doesn't match the resolvers property type.
+    schema: buildSubgraphSchema({
+      typeDefs: gql(printedSchema),
+      resolvers: resolvers
+    })
+  });
   const { url } = await server.listen(4000);
   console.log(`🚀 Server ready at ${url}`);
 }

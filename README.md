@@ -49,11 +49,28 @@ mutation CreateActors {
     input: [
       {
         name: "Richard Dreyfuss"
-        connect: { where: { node: { id: "<ID FROM JAWS>" } } }
+        movies: {
+          connect: {
+            where: {
+              node: {
+                id: "<ID FROM JAWS>"
+              }
+            }
+          }
+        }
+
       }
       {
         name: "Janet Leigh"
-        connect: { where: { node: { id: "<ID FROM PSYCHO>" } } }
+        movies: {
+          connect: {
+            where: {
+              node: {
+                id: "<ID FROM PSYCHO>"
+              }
+            }
+          }
+        }
       }
     ]
   ) {

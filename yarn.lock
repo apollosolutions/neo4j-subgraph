@@ -9,6 +9,22 @@
   dependencies:
     "@jridgewell/trace-mapping" "^0.3.0"
 
+"@apollo/core-schema@~0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@apollo/core-schema/-/core-schema-0.3.0.tgz#c6c1a6821fb326501d73eb85d920bbf57906cc77"
+  integrity sha512-v+Ys6+W1pDQu+XwP++tI5y4oZdzKrEuVXwsEenOmg2FO/3/G08C+qMhQ9YQ9Ug34rvQGQtgbIDssHEVk4YZS7g==
+  dependencies:
+    "@protoplasm/recall" "^0.2"
+
+"@apollo/federation-internals@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@apollo/federation-internals/-/federation-internals-2.0.1.tgz#582bbc732015ec63117da958e79ded7495fbbf79"
+  integrity sha512-as2lL0tChwQx3PgBKQ8hELal2paBFsbucXSba+Gi84ZP1wGtYtl5kJmE7DVImsC+/CAVjEFWM7aWQGJg6Im8Ow==
+  dependencies:
+    "@apollo/core-schema" "~0.3.0"
+    chalk "^4.1.0"
+    js-levenshtein "^1.1.6"
+
 "@apollo/protobufjs@1.2.2":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@apollo/protobufjs/-/protobufjs-1.2.2.tgz#4bd92cd7701ccaef6d517cdb75af2755f049f87c"
@@ -28,10 +44,12 @@
     "@types/node" "^10.1.0"
     long "^4.0.0"
 
-"@apollo/subgraph@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@apollo/subgraph/-/subgraph-0.4.0.tgz#4c6fc2bcc03b1715e7bcb7071f79512f3c5cee1e"
-  integrity sha512-Fg9XGaXpFP+X2J5HswIin/0ksmZShdukBtmtbMgvxJs7wfStlr+7m8gice4YSXYm/nu4td+UxUAfaqUjLYiFbQ==
+"@apollo/subgraph@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@apollo/subgraph/-/subgraph-2.0.1.tgz#ae638802c9841fc3189b9e8545a93bfab0378c90"
+  integrity sha512-GHfJ+W7A2yiES+7nKlPFcjDuXFbj/hgGADVcNo+3HUSHOR8l+7gUhn/7pED0bhUPO5Dr2yEgz7aA39MiQ6PHTQ==
+  dependencies:
+    "@apollo/federation-internals" "^2.0.1"
 
 "@apollographql/apollo-tools@^0.5.3":
   version "0.5.3"
@@ -990,6 +1008,11 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
+
+"@protoplasm/recall@^0.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@protoplasm/recall/-/recall-0.2.2.tgz#4d8b259efba89938220088d444011b961ae3775a"
+  integrity sha512-grQIYNd3UsFjHXL1g5Qw5MdUNAddEcD1KfqiO6WeMOQHgIgECXo7r4jfcXGIh37q17HoGQgq/G4guMGkzQ+UOA==
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
@@ -3490,6 +3513,11 @@ jest@^27.5.1:
     "@jest/core" "^27.5.1"
     import-local "^3.0.2"
     jest-cli "^27.5.1"
+
+js-levenshtein@^1.1.6:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/js-levenshtein/-/js-levenshtein-1.1.6.tgz#c6cee58eb3550372df8deb85fad5ce66ce01d59d"
+  integrity sha512-X2BB11YZtrRqY4EnQcLX5Rh373zbK4alC1FW7D7MBhL2gtcC17cTnr6DmfHZeS0s2rTHjUTMMHfG7gO8SSdw+g==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"

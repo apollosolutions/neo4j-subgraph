@@ -8,7 +8,7 @@
     "test": "node --experimental-vm-modules $(yarn bin)/jest"
   },
   "dependencies": {
-    "@apollo/subgraph": "^0.4.0",
+    "@apollo/subgraph": "^2.0.1",
     "@graphql-tools/utils": "^8.6.5",
     "@neo4j/graphql": "^3.0.3",
     "@neo4j/graphql-ogm": "^3.0.3",
